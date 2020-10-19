@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <!--Styles-->
+        <link rel="stylesheet" href="../node_modules/figma-plugin-ds/dist/figma-plugin-ds.css">
+    </head>
+        <body>
+         <div id="app">
+        <div id="styleList">
+        <table>
+        <thead>
+            <tr>
+             
+              <th scope="col">
+                <div class="checkbox">
+                  <input id="selectAll" name="mainCheckbox" type="checkbox" class="checkbox__box">
+                  <label for="selectAll" class="checkbox__label" id="mainCheckboxLabel" >Select All</label>
+                </div>
+                <!-- <label for="selectAll">
+                <input type="checkbox" name='mainCheckbox' id="selectAll"/>
+                <span class="label" id="mainCheckboxLabel">Select all</span></label> -->
+                <th scope="col">
+                  <div class="icon-button" id="refresh" style="display: flex;width:auto">
+                    <div class="icon icon--swap"></div><span class="type type--small" style="padding-right: var(--size-xxsmall)"> Refresh List </span>
+                  </div>
+                </th>
+              </th>
+              
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            
+            
+          </tbody>
+        </table>
+        </div>
+        <div class="" id="configWrapper">
+          <div class="input">
+          <label for="findString" class="label">Find Text</label>
+          <input type="text" class="input__field" id="findString" placeholder="Find"/>
+          </div>
+          <div class="input">
+          <label for="replaceString" class="label">Replace Text</label>
+          <input type="text" class="input__field" id="replaceString" placeholder="Replace With"/>
+          </div>
+          <div class="buttonRow">
+            <button class="button button--primary" id="rename">Rename</button>
+            <button class="button button--secondary" id="cancel">Cancel</button>
+          </div>
+        </div>
+        </div>
+       
+
+        </body>
+</html>

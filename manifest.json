@@ -1,0 +1,7 @@
+{
+  "name": "Rename Paint Styles",
+  "id": "899682655913987080",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html"
+}

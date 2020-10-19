@@ -1,0 +1,224 @@
+/* body {
+    font: 12px sans-serif;
+    text-align: center;
+    margin: 20px;
+  }
+  button {
+    border-radius: 5px;
+    background: white;
+    color: black;
+    border: none;
+    padding: 8px 15px;
+    margin: 0 5px;
+    box-shadow: inset 0 0 0 1px black;
+    outline: none;
+  }
+  #create {
+    box-shadow: none;
+    background: #18A0FB;
+    color: white;
+  }
+  input {
+    border: none;
+    outline: none;
+    padding: 8px;
+  }
+  input:hover { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); }
+  button:focus { box-shadow: inset 0 0 0 2px #18A0FB; }
+  #create:focus { box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.3); }
+  input:focus { box-shadow: inset 0 0 0 2px #18A0FB; } */
+
+  
+body{
+  margin: 0px;
+  user-select: none;
+}
+
+#app{
+  font-family: Inter, sans-serif;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+#tableWrapper{
+  overflow-y: scroll;
+  height: auto;
+  width: 50%;
+}
+#configWrapper{
+  display: flex;
+  flex-direction: column;
+}
+#configWrapper div{
+  margin-bottom: 8px;
+}
+
+#tableBody tr{
+  height: 32px;
+}
+
+.swatch{
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  margin: auto 8px auto 16px;
+}
+
+.table-primary {
+  background: var(--selection-a)
+}
+
+.table-primary .swatch{
+  box-shadow: 0 0 0 1px #fff;
+  border: none;
+}
+
+.full-width-label {
+  width: 100%;
+  display: block;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content:flex-start;
+  flex-direction: row;
+  /* font-weight: 400;
+  font-style: normal;
+  font-size: 11px;
+  line-height: 16px; */
+  text-overflow: ellipsis;
+  /* color: var(--black8-opaque);
+  font-feature-settings: "liga" on,"calt" on; */
+}
+
+thead label{
+  font-size: 11px;
+}
+
+table {
+  border-spacing: 0;
+  width: 100%
+}
+
+.table-row {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+#styleList{
+  width: 240px;
+}
+
+.checkRow {
+  visibility: hidden;
+  display: none;
+}
+
+#app{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#styleList{
+  overflow-y: overlay;
+  overflow-x: hidden;
+}
+
+/* width */
+::-webkit-scrollbar {
+ width: 6px;
+ padding: 2px;
+ position: relative;
+ right: 10px;
+ background: transparent;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+  width: 6px;
+  padding: 2px;
+  
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  width: 6px;
+  right: 2px;
+  position: relative;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.15);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+table{
+  width: inherit;
+  max-width: inherit;
+  min-width: inherit;
+  box-shadow: inset -1px 0 var(--black1);
+}
+
+#styleList{
+  box-shadow: inset -1px 0 var(--black1);
+}
+
+#styleList table thead{
+  position: fixed;
+  background: var(--white);
+  padding: var(--size--xxsmall);
+  top: 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: var(--size-large);
+  width: inherit;
+  z-index: 2;
+  box-shadow: inset -1px -1px var(--black1);
+}
+
+#styleList table thead tr{
+    width: inherit;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: var(--size-xxxsmall);
+}
+
+#styleList table tbody{
+  transform: translate3d(0, var(--size-large), 0);
+  width: inherit
+}
+
+#configWrapper{
+  width: auto;
+    padding: var(--size-xlarge);
+    box-sizing: border-box;
+    flex-grow: 1;
+    flex-shrink: 0;
+    justify-content: center;
+}
+
+.label {
+  color: var(--black8) !important;
+}
+
+.buttonRow{
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+}
+.buttonRow button:not(:last-child){
+  margin-left: var(--size-xxsmall);
+}
