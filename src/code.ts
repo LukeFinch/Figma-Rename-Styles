@@ -1,3 +1,6 @@
+import { extractLinearGradientParamsFromTransform}  from "@figma-plugin/helpers"
+
+
 function parseGradient(p) {
   console.log('I got called')
   console.log(p)
@@ -6,6 +9,9 @@ function parseGradient(p) {
   switch (p.type) {
     case 'GRADIENT_LINEAR':
       type = "linear-gradient"
+      let angleData = extractLinearGradientParamsFromTransform(18, 18,p.gradientTransform)
+      console.log(angleData)
+      angle = angleBetween(angleData.start, angleData.end) + 90
       break;
     case 'GRADIENT_RADIAL':
       type = "radial-gradient"
@@ -14,7 +20,6 @@ function parseGradient(p) {
       type = "angular-gradient"
       break;
   }
-
   let stops = p.gradientStops
   let str = []
   stops.forEach(stop => {
@@ -27,7 +32,7 @@ function parseGradient(p) {
 
   })
 
-  let output = `${type}(${angle}deg,${str.join(',')})`
+  let output = `${type}(${angle}deg, ${str.join(',')})`
   console.log(output)
   return output
 }
@@ -35,8 +40,7 @@ function parseGradient(p) {
 
 function color255(color){
   console.log('color 255')
-  
-  return color.a ? `rgba(${color.r * 255},${color.g * 255},${color.b * 255},${color.a * 255})` :  `rgb(${color.r * 255},${color.g * 255},${color.b * 255})`
+  return `rgba(${color.r * 255},${color.g * 255},${color.b * 255},${color.a})`
   
 }
 
@@ -54,34 +58,41 @@ function updateList(){
 
 
     let style = []
+
+    let c = {'name':'','id':'','style': [],'alpha': 1}
+
     paint.paints.forEach(p => {
       switch(p.type) {
         case 'SOLID':
-        style.push(`rgba(${p.color.r * 255},${p.color.g * 255},${p.color.b * 255},${p.opacity})`)
+        style.push({background: `rgba(${p.color.r * 255},${p.color.g * 255},${p.color.b * 255},${p.opacity})`, opacity: 1, type: 'solid'})
         break;
         case 'IMAGE':
         break;
           default:
-          style.push(parseGradient(p))
+
+          style.push({background: parseGradient(p), opacity: p.opacity, type: 'gradient'})
           break;
   
       }
     })
-     let c = {'name':'','id':'','style': ''}
-    c.style = style.join(',')
+    if(paint.paints.length == 1){
+      c.alpha = paint.paints[0].opacity
+    }
+    c.style = style
     c.name = paint.name
     c.id = paint.id
+    
     myArr.push(c)
   })
   
-  figma.ui.postMessage(JSON.stringify(myArr))
+  figma.ui.postMessage({type: "update-list", 'dataStr': JSON.stringify(myArr), 'dataArr': myArr})
 
 }
 
 
 //Used for gradients, to know what direction they face.
 function angleBetween(p1, p2) {
-  let angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+  let angleDeg = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180 / Math.PI;
   return Math.round(angleDeg)
 }
 

@@ -24,6 +24,7 @@
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
+    "@figma-plugin/helpers": "^0.14.3",
     "@types/jquery": "^3.5.3",
     "figma-plugin-ds": "^0.1.8",
     "file-loader": "^6.1.1"
