@@ -2,15 +2,14 @@ import { extractLinearGradientParamsFromTransform}  from "@figma-plugin/helpers"
 
 
 function parseGradient(p) {
-  console.log('I got called')
-  console.log(p)
+
   let angle = 180 //angleBetween(gradient.from(), gradient.to())
   let type = ''
   switch (p.type) {
     case 'GRADIENT_LINEAR':
       type = "linear-gradient"
       let angleData = extractLinearGradientParamsFromTransform(18, 18,p.gradientTransform)
-      console.log(angleData)
+
       angle = angleBetween(angleData.start, angleData.end) + 90
       break;
     case 'GRADIENT_RADIAL':
@@ -33,13 +32,13 @@ function parseGradient(p) {
   })
 
   let output = `${type}(${angle}deg, ${str.join(',')})`
-  console.log(output)
+
   return output
 }
 
 
 function color255(color){
-  console.log('color 255')
+
   return `rgba(${color.r * 255},${color.g * 255},${color.b * 255},${color.a})`
   
 }
@@ -100,12 +99,14 @@ figma.ui.onmessage = msg => {
   if(msg.type === 'refresh-list'){
     updateList()
   }
-if (msg.type === 'rename-color') {  
-  let dat = JSON.parse(msg.data)
+if (msg.type === 'rename-color') {
+  console.log(msg)  
+  msg.newNames.forEach(dat => { 
   let p = figma.getLocalPaintStyles().find(paint => paint.id == dat.id)
 
   p != undefined ? p.name = dat.name : null;
-
+})
+figma.notify(`Renamed ${msg.newNames.length} styles`)
   updateList()
 }
   if(msg.type === 'cancel'){

@@ -24,7 +24,7 @@ var mainCheck = document.getElementsByName('mainCheckbox')[0] as unknown as HTML
         const tableBody = document.getElementById('tableBody')
         tableBody.innerHTML = ""
       
-        console.log('data array',event.data.pluginMessage.dataArr)
+
         //let colors = JSON.parse(event.data.pluginMessage.dataStr)
             let colors = event.data.pluginMessage.dataArr
         
@@ -60,8 +60,7 @@ var mainCheck = document.getElementsByName('mainCheckbox')[0] as unknown as HTML
               let layer = document.createElement('div')
               layer.className = "swatchLayer"
               layer.style.opacity = style.opacity;
-              console.log(style)
-              if(style.type === "solid"){layer.style.background = style.background}
+                if(style.type === "solid"){layer.style.background = style.background}
               if(style.type === "gradient"){layer.style.backgroundImage = style.background}
               
               swatch.appendChild(layer)
@@ -202,7 +201,7 @@ var mainCheck = document.getElementsByName('mainCheckbox')[0] as unknown as HTML
           
         //Do the renaming
           document.getElementById('rename').onclick = () => {
-        
+            let newNames = []
           checkValArray.forEach((val,index) => {
            
             
@@ -211,11 +210,12 @@ var mainCheck = document.getElementsByName('mainCheckbox')[0] as unknown as HTML
           
             let name = val.value.replace(new RegExp(findStr, 'g'), repStr)
           
-            let data = JSON.stringify({'name':name,'id': val.id})
-            // console.log(data)
+            let data = {'name':name,'id': val.id}
+            newNames.push(data)
+            // console.log(data)          
           
-            parent.postMessage({pluginMessage: {type: 'rename-color', data } }, '*')
           })
+          parent.postMessage({pluginMessage: {type: 'rename-color', newNames } }, '*')
         }
         document.getElementById('cancel').onclick = () => {
             parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
