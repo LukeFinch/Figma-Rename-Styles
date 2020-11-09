@@ -1,5 +1,5 @@
 {
-	"name": "Vue3 Plugin Template",
+	"name": "Rename Vue3",
 	"api": "1.0.0",
 	"main": "dist/code.js",
 	"ui": "dist/ui.html",
