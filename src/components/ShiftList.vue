@@ -126,30 +126,19 @@ export default {
 
     var lastChecked=null
     var lastCheckedEl=null
-    const isCheckAll=ref(false)
 
+    const isCheckAll = computed(() => {
+     return filteredList.value.some((el) => el.selected === false)
+    })
 
-
-  
     const checkAllLabel = computed(() => isCheckAll.value ? 'None' : 'All')
     const orderedSel    = computed(() => mapOrder(Array.from(selection), list.value))
     const filteredList  = computed(() => list.value.filter((item) => { 
-        return fuzzySearch(search.value.toLowerCase(), item.name.toLowerCase())
-      }))
+                          return fuzzySearch(search.value.toLowerCase(), item.name.toLowerCase())
+                          }))
 
+ 
 
-     function updateCheckAll(color, index, $event) {
-      //Check if the search is empty
-      if (search.value !== "") {
-        let filterCheck = true;
-      //If any aren't selected, it must be unticked
-      if(filteredList.value.some((el) => el.selected === false )){
-            filterCheck = false
-         }
-      //Set the check value
-        isCheckAll.value = filterCheck;
-      }
-    }
 
   function onRowClick(item, index, $event) {
 
@@ -181,8 +170,7 @@ export default {
 
       lastChecked = index;
       lastCheckedEl = item;
-      updateCheckAll();
-      //updatePreview();
+
     }
 
   function checkAll() {
@@ -199,7 +187,6 @@ export default {
           filteredList.value[key].selected = true
         }
       }
-      updateCheckAll()
     }
 
 
@@ -245,7 +232,6 @@ export default {
       refresh,
       checkAll,
       onRowClick,
-      updateCheckAll,
       filteredList,
       orderedSel,
       checkAllLabel,
