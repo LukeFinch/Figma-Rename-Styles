@@ -12,20 +12,24 @@
 </template>
 <script>
 import { disclosure } from 'figma-plugin-ds'
-
+import { onMounted } from 'vue'
 
 
 export default {
-
-    props: {
+  props: {
         heading: String,
         expanded: Boolean,
         section: Boolean,
 
     },
-    mounted() {
+  setup(props){
+
+
+  onMounted( () => {
       disclosure.init()
     }   
+  )
+}
 }
 </script>
 <style lang="scss" scoped>

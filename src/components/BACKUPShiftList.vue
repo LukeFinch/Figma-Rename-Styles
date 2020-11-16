@@ -7,7 +7,7 @@
           <div class="icon icon--search"></div>
           <input type="text" v-model="search" placeholder="Search" class="input__field" @input="updateCheckAll()">
 
-          <div  v-if="search.value !== '' " class="icon icon--close right" @click='search.value = ""; updateCheckAll()'></div>
+          <div  v-if="search !== '' " class="icon icon--close right" @click='search = ""; updateCheckAll()'></div>
         </div>
 
           </div>
@@ -27,6 +27,8 @@
                 </label>
           </div>
       </header>
+   
+          
         <div class="row content"> 
         <ScrollArea>
             <div
@@ -79,7 +81,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, watchEffect, inject, reactive, toRefs } from 'vue'
+import { ref, onBeforeUpdate, onUpdated } from 'vue'
 
 import "../../node_modules/figma-plugin-ds/dist/figma-plugin-ds.css";
 import { dispatch, handleEvent } from "../uiMessageHandler";
@@ -91,6 +93,8 @@ import ScrollArea from './ScrollArea.vue'
 import { mapOrder } from '../util'
 
 import { selectMenu } from 'figma-plugin-ds'
+
+
 
 function fuzzySearch(needle, haystack) {
   var hlen = haystack.length;
@@ -112,160 +116,164 @@ function fuzzySearch(needle, haystack) {
   }
   return true;
 }
-const list=ref([])
-export const selection = computed(() =>  {return list.value.filter(li => {return li.selected === true})})
 
 export default {
-  components: {
+  data() {
+    return {
+      list: [],
+      search: "",
+      lastChecked: null,
+      isCheckAll: false,
+      selection: new Set(),
+    };
+  },
+    components: {
     Swatch,
     ScrollArea
   },
-  setup( props ) {
+  computed: {
+    checkAllLabel(){
+      return this.isCheckAll ? 'None' : 'All '
+    },
 
-    const search = ref('');
+    orderedSel() {
+      //return this.selection
+      return mapOrder(Array.from(this.selection), this.list);
+    },
 
-    var lastChecked=null
-    var lastCheckedEl=null
-    const isCheckAll=ref(false)
+    filteredList() {
 
-
-
-  
-    const checkAllLabel = computed(() => isCheckAll.value ? 'None' : 'All')
-    const orderedSel    = computed(() => mapOrder(Array.from(selection), list.value))
-    const filteredList  = computed(() => list.value.filter((item) => { 
-        return fuzzySearch(search.value.toLowerCase(), item.name.toLowerCase())
-      }))
-
-
-     function updateCheckAll(color, index, $event) {
-      //Check if the search is empty
-      if (search.value !== "") {
-        let filterCheck = true;
-      //If any aren't selected, it must be unticked
-      if(filteredList.value.some((el) => el.selected === false )){
-            filterCheck = false
-         }
-      //Set the check value
-        isCheckAll.value = filterCheck;
-      }
-    }
-
-  function onRowClick(item, index, $event) {
-
-       item.selected = !item.selected
-
-      if ($event.shiftKey && lastChecked !== null && lastCheckedEl !== null) {
-
-        let start = index;
-        let end = lastChecked;
-
-        var selectedChecks = filteredList.value.slice(
-          Math.min(start, end),
-          Math.max(start, end) + 1
-        );
-
-        if(lastCheckedEl.selected){
-          selectedChecks.forEach(el => {
-            el.selected = true
-          })
-        } else {
-          selectedChecks.forEach(el => {
-            el.selected = false
-          })
-        }
-
-        lastChecked = null;
-        lastCheckedEl = null;
-      }
-
-      lastChecked = index;
-      lastCheckedEl = item;
-      updateCheckAll();
-      //updatePreview();
-    }
-
-  function checkAll() {
-      lastChecked = null;
-      isCheckAll.value = !isCheckAll.value;
-
-      filteredList.value.forEach((el) => {
-        el.selected = false
+      return this.list.filter((item) => {
+        return fuzzySearch(this.search.toLowerCase(), item.name.toLowerCase());
       });
+    },
+  },
+  watch: {
+    orderedSel: {
+      //selection
+      handler: function (newVal) {
+        
+        let values = new Set()
 
-      if (isCheckAll.value) {
-        //Check all
-        for (var key in filteredList.value) {
-          filteredList.value[key].selected = true
-        }
-      }
-      updateCheckAll()
-    }
+        newVal.forEach(val => values.add(val))
 
+        this.storeSelection(values)
 
-
-   function refresh(){
-    dispatch("requestColors")
-    }  
-
-
-
-    onMounted( () => {
+      },
+      deep: true,
+    },
+  },
+  mounted() {
    
         selectMenu.init();
 
         dispatch("requestColors")
 
         handleEvent("listColors", listOfColors => {
-
-            let prevSel = list.value.filter(li => li.selected)
-
-            list.value = listOfColors
+            this.list = listOfColors
             
-            prevSel.forEach(sel => list.value.find((li) => li.id === sel.id).selected = sel.selected )
+            this.$store.commit('updateList', listOfColors)
 
-
-        
-
+            this.selection.forEach(sel => {
+              this.filteredList.find(item => item.id === sel.id).selected = true
+            })
+            this.selection = new Set(this.filteredList.filter(item => item.selected === true))
+            this.storeSelection(this.selection)
         })
-  })
+  },
+  methods: {
+    refresh(){
+      dispatch("requestColors")
+    },
+    storeSelection(selection){
+
+      this.$store.commit('updateSelection', selection)
+
+    },
+    onRowClick: function (item, index, $event) {
 
 
+       item.selected = !item.selected
+
+      if ($event.shiftKey && this.lastChecked != null) {
 
 
-  watchEffect( () => {
-    let values = new Set()
-    orderedSel.value.forEach(val => values.add(val))
+        let start = index;
+        let end = this.lastChecked;
 
-  })
+        var selectedChecks = this.filteredList.slice(
+          Math.min(start, end),
+          Math.max(start, end) + 1
+        );
+        console.log('checks',selectedChecks)
+       console.log('selection',this.selection)
+        selectedChecks.forEach((el, key) => {
+         
+          //If the lastChecked is checked
+          if (this.selection.has(this.filteredList[this.lastChecked])) {
+            //If the checkbox isn't already selected
+            if (!this.selection.has(el)) {
+              //add it to the selected model
+              this.selection.add(el);
+              el.selected = true
+            }
+            //Else the last checked was just unchecked
+          } else {
+            //If a checkbox within the selection is checked
+            if (this.selection.has(el)) {
+              //remove it from the model
+              this.selection.delete(el);
+              el.selected = false
+            }
+          }
+        });
 
+        this.lastChecked = null;
+      }
 
-
-  return {
-      refresh,
-      checkAll,
-      onRowClick,
-      updateCheckAll,
-      filteredList,
-      orderedSel,
-      checkAllLabel,
-      list,
-      search,
-      lastChecked,
-      isCheckAll,
-      selection
+      this.lastChecked = index;
+      this.updateCheckAll();
+      this.updatePreview();
+    },
+    updatePreview: function () {
+      this.selection = new Set(this.list.filter(el => el.selected === true))
     }
-  }
-}
+    ,
+    updateCheckAll: function (color, index, $event) {
+      //Check if the search is empty
+      if (this.search !== "") {
+        let filterCheck = true;
+      //If any aren't selected, it must be unticked
+      if(this.filteredList.some((el) => el.selected === false )){
+            filterCheck = false
+         }
+      //Set the check value
+        this.isCheckAll = filterCheck;
+      }
 
+    },
+    checkAll: function () {
+      this.lastChecked = null;
+      this.isCheckAll = !this.isCheckAll;
+      //this.selection = [];
 
+      this.filteredList.forEach((el) => {
+        el.selected = false
+        this.selection.delete(el)
+      });
 
+      if (this.isCheckAll) {
+        //Check all
+        for (var key in this.filteredList) {
+          this.filteredList[key].selected = true
+          this.selection.add(this.filteredList[key]);
+        }
+      }
+      this.updateCheckAll()
+    },
+  },
 
- 
-  
-    
-    
-
+};
 </script>
 <style scoped lang="scss">
 

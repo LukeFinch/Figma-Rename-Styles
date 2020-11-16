@@ -10,23 +10,23 @@
 <ScrollArea class="row content ">
 <div class="input">
   <label for="find" class="label">Find</label >
-  <input id="find" type="input" class="input__field" placeholder="Find" v-model="find">
+  <input id="find" type="input" class="input__field" placeholder="Find" v-model="state.find">
 </div>
 
   <div class="switch">
-    <input class="switch__toggle" type="checkbox" id="ignoreCase" value="i" v-model="regexflags" checked>
+    <input class="switch__toggle" type="checkbox" id="ignoreCase" value="i" v-model="state.regexflags" checked>
     <label class="switch__label" for="ignoreCase">Match Case</label>
 </div>
 
 <div class="input">
   <label for="replace" class="label">Replace</label>
-  <input id="replace" type="input" class="input__field" placeholder="Replace" v-model="replace">
+  <input id="replace" type="input" class="input__field" placeholder="Replace" v-model="state.replace">
 </div>
 
 
   <Disclosure heading="Preview" :expanded=true :section=false :scrollInside=true>
       <ul class="type type--pos-small-normal">
-        <li v-for="(item, index) in this.newPreview" :key="index">
+        <li v-for="(item, index) in state.replacedPreview" :key="index">
           {{item.name}} 
         </li>
       </ul>
@@ -49,9 +49,12 @@
 
 <script>
 
+import { selection } from './components/ShiftList.vue'
+
+
 import styles from '../node_modules/figma-plugin-ds/dist/figma-plugin-ds.css'
 
-import { toRef, unref } from 'vue'
+import { ref, reactive, computed, watchEffect, onMounted } from 'vue'
 
 import { dispatch, handleEvent } from "./uiMessageHandler";
 
@@ -60,7 +63,7 @@ import { mapOrder } from './util.ts'
 
 import Disclosure from './components/Disclosure.vue'
 import ColorList from './components/colorList.vue'
-import ShiftList from './components/ShiftList.vue'
+import { default as ShiftList } from './components/ShiftList.vue'
 import ScrollArea from './components/ScrollArea.vue'
 
 
@@ -72,88 +75,66 @@ export default {
     Disclosure,
     ScrollArea
   },
-  data() {
-    return {
-      selection: new Set(),
-      preview: [],
-      colors: [],
-      message: "",
-      find: "",
-      replace: "",
-      regexflags: ['i'],
-      newPreview: [],
-    };
-  },
-  watch:{
-    regexflags:{
-      handler: function(){
-        this.updateFindReplace()
-      },
-      deep: true      
-    },
-    Sel: { 
-      handler: function(){
+  setup(props){
 
-      this.updateFindReplace()
+  const state = reactive({
+    regexflags: "i",
+    find: "",
+    replace: "",
+    preview: computed(() => {return selection.value}),
+    replacedPreview: computed(() => {return previewReplace()})
+    })
 
-    },
-      deep: true
-    },
-     '$store.state.list': function(){
-      this.list = this.$store.state.list
-    },
-    '$store.state.selection': function() {
-      this.selection = this.$store.state.selection
-    },
-    find: function() {
-      this.updateFindReplace()
-    },
-    replace: function() {
-      this.updateFindReplace()
-    }
-  },
-  mounted() {
-  },
-  computed: {
-    Sel(){
-      return this.selection
-    },
-    orderedPreview(){
+  function orderedPreview(){
       return mapOrder(this.$store.state.selection, this.$store.state.list, 'id')
-    }
-  },
-  methods: {
-    updateFindReplace(){
-
-      this.preview = Array.from(this.$store.state.selection)
-
-     // let newPrev = Object.assign({}, ...Object.keys(this.preview).map(k => ({[k]: this.preview[k]})))
-
-     let newPreview = this.preview.map(obj => {
-          return Object.assign({}, ...Object.keys(obj).map(k => ({[k]: obj[k]})))
-      })
-
-      this.newPreview = newPreview    
-
-   
-      this.newPreview.forEach(sel => {    
-        //console.log('sel',sel)
-        if(this.find !== ""){
-          let reg = new RegExp(this.find,'g'+this.regexflags.join(""))  
-          sel.name = sel.name.replace(reg, replace.value)
-        }
-      })
-    },
-    rename(){    
-       let data  = this.newPreview.map(x => {return {name: x.name, id: x.id}})
-       dispatch('rename',data)
-    },
-
-    createNode() {
-      // This shows how the UI code can send messages to the main code.
-      dispatch("createNode");
-    }
   }
+
+  console.log(selection,selection.value)
+
+
+onMounted( () => {
+
+    watchEffect(() => console.log(selection.value))
+    watchEffect(() => state.preview.value = [...selection.value])
+
+
+    
+function previewReplace() {
+  let ret
+  if(state.preview.value && state.find.value.length > 0){
+    ret = state.preview.value.map(li => {
+      return li.name.replace(new RegExp (state.find.value, 'g'), state.replace.value)
+    })
+  }
+  else {ret = state.preview.value }
+  return ret
+  }
+
+
+})
+
+
+
+
+
+
+
+
+ function rename(state){    
+       let data  = state.replacedPreview.value.map(x => {return {name: x.name, id: x.id}})
+       dispatch('rename',data)
+    }
+    
+    return {
+      state,
+      rename,
+      colors: [],
+    };
+  }
+
+ 
+
+
 };
 </script>
 

@@ -1,23 +1,32 @@
 <template>
-    <div>
+    <div ref="root">
         <slot></slot>
     </div>
 </template>
-<script>
 
+<script>
 import SimpleBar from 'simplebar'
 import 'simplebar/dist/simplebar.css'
 
 
 
+import { onMounted, ref } from 'vue'
 
 
-export default {
-    mounted() {
-        console.log('mounting',this.$el)
-        new SimpleBar(this.$el, {autoHide: false})
+  export default {
+    setup() {
+      const root = ref(null)
+
+      onMounted(() => {
+        new SimpleBar(root.value, {autoHide: false})
+      })
+
+      return {
+        root
+      };
     }
-}
+  }
+
 </script>
 <style lang="scss">
 
