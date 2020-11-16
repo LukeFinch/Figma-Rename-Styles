@@ -7,7 +7,7 @@
           <div class="icon icon--search"></div>
           <input type="text" v-model="search" placeholder="Search" class="input__field" @input="updateCheckAll()">
 
-          <div  v-if="search.value !== '' " class="icon icon--close right" @click='search.value = ""; updateCheckAll()'></div>
+          <div  v-if="search !== '' " class="icon icon--close right" @click='search = ""; updateCheckAll()'></div>
         </div>
 
           </div>
