@@ -14,7 +14,7 @@
 </div>
 
   <div class="switch">
-    <input class="switch__toggle" type="checkbox" id="ignoreCase" value="i" v-model="state.regexflags" checked>
+    <input class="switch__toggle" type="checkbox" id="ignoreCase" value="i" v-model="state.matchCase">
     <label class="switch__label" for="ignoreCase">Match Case</label>
 </div>
 
@@ -78,39 +78,29 @@ export default {
   setup(props){
 
   const state = reactive({
-    regexflags: "i",
+    matchCase: false,
     find: "",
     replace: "",
-    preview: computed(() => {return selection.value}),
-    replacedPreview: computed(() => {return previewReplace()})
-    })
+    basePreview: computed(() => {return [...selection.value]}),
+    replacedPreview: computed(() => {
+                      //Assign a new mutable array thats a clone of the selection
+                      let newPreview = state.basePreview.value ? state.basePreview.value.slice(0).map(o => {return Object.assign({},o)}) : [];
+                      if(state.find !== ""){
+                        newPreview.forEach(prev => {
+                          let flags  = `g${state.matchCase ? 'i' : ''}`
+                            prev.name = prev.name.replace(new RegExp (state.find, flags ), state.replace)
+                        })                      
+                      }
+                      return newPreview
+                      })
+  })
 
   function orderedPreview(){
       return mapOrder(this.$store.state.selection, this.$store.state.list, 'id')
   }
 
-  console.log(selection,selection.value)
-
-
 onMounted( () => {
-
-    watchEffect(() => console.log(selection.value))
-    watchEffect(() => state.preview.value = [...selection.value])
-
-
-    
-function previewReplace() {
-  let ret
-  if(state.preview.value && state.find.value.length > 0){
-    ret = state.preview.value.map(li => {
-      return li.name.replace(new RegExp (state.find.value, 'g'), state.replace.value)
-    })
-  }
-  else {ret = state.preview.value }
-  return ret
-  }
-
-
+    watchEffect(() => state.basePreview.value = [...selection.value])
 })
 
 
@@ -119,9 +109,9 @@ function previewReplace() {
 
 
 
-
- function rename(state){    
-       let data  = state.replacedPreview.value.map(x => {return {name: x.name, id: x.id}})
+ function rename(){
+       let data  = state.replacedPreview.map(x => {return {name: x.name, id: x.id}})
+       console.log(data)
        dispatch('rename',data)
     }
     
