@@ -28,7 +28,7 @@
           </div>
       </header>
         <div class="row content"> 
-        <ScrollArea>
+        <ScrollArea v-if="list.length">
             <div
               class="list-row"
               v-for="(item, index) in filteredList"
@@ -40,7 +40,7 @@
                :layers="item.style"
                :alpha="item.alpha"
             />
-            <img v-else-if="listType == 'text'" :src="SVGFromBuffer(item.buffer)" class="style_icon" />
+            <div v-else-if="listType == 'text'" :style="{'background-image': `url(${item.img})`}" class="style_icon style_icon--text" />
               <div class="content">
                 <input
                   type="checkbox"
@@ -56,6 +56,7 @@
               </div>
             </div>
         </ScrollArea>
+        <Spinner v-else/>
         </div>
 
     <footer class="row footer">
@@ -82,6 +83,7 @@ import { dispatch, handleEvent } from "../uiMessageHandler";
 import Swatch from './swatch.vue'
 import ScrollArea from './ScrollArea.vue'
 import SelectMenu from './select.vue'
+import Spinner from './Spinner.vue'
 
 import { mapOrder } from '../utils/util'
 
@@ -114,7 +116,8 @@ export default {
   components: {
     Swatch,
     ScrollArea,
-    SelectMenu
+    SelectMenu,
+    Spinner
   },
   setup( props ) {
 
@@ -194,46 +197,57 @@ export default {
       }
     }
 
-  function SVGFromBuffer(buffer){
-      const imgBase64 =
-          "data:image/svg+xml;base64," +
-          btoa(
-            new Uint8Array(buffer).reduce((data, byte) => {
-              return data + String.fromCharCode(byte);
-            }, "")
-          );
-        return imgBase64
-}
 
 
-   function refreshList(){
+   async function refreshList(){
      console.log('requesting new list of type: ' + listType.value)
       dispatch("requestStyles", listType.value)
-    }  
+
+       let prevSel = list.value.slice().filter(li => li.selected)
+       list.value = []
+      const returnedData = new Promise( function(resolve){
+        handleEvent("styleList", listOfStyles => {
+          resolve(listOfStyles)
+        })
+      })
+      Promise.resolve(returnedData).then((data) => {
+        console.log(data)
+        listType.value = data.type
+        list.value = data.list
+        prevSel.forEach(sel => list.value.find((li) => li.id === sel.id).selected = sel.selected)
+      } )
+
+      // let prevSel = list.value.slice().filter(li => li.selected)
+      // list.value = ''
+      // const awaitedList = handleEvent("styleList", listOfStyles => {
+      //   return listOfStyles
+      // }).then((styles) => {
+      //   list.value = styles.list;
+      //   list.type = styles.type
+      //   prevSel.forEach(sel => list.value.find((li) => li.id === sel.id).selected = sel.selected)
+      // })
+
+      }  
 
 
 
     onMounted( () => {
    
         refreshList()
-
-        handleEvent("styleList", listOfStyles => {
-          console.log(listOfStyles)
-            if(listType.value === listOfStyles.type){
-            let prevSel = list.value.filter(li => li.selected)
-            list.value = listOfStyles.list            
-            prevSel.forEach(sel => list.value.find((li) => li.id === sel.id).selected = sel.selected )
-            } else {
-              listType.value = listOfStyles.type
-              list.value = listOfStyles.list              
-            }
-
-           
-
-
+        
         
 
-        })
+        // handleEvent("styleList", listOfStyles => {
+        //   console.log(listOfStyles)
+        //     if(listType.value === listOfStyles.type){
+        //     let prevSel = list.value.filter(li => li.selected)
+        //     list.value = listOfStyles.list            
+        //     prevSel.forEach(sel => list.value.find((li) => li.id === sel.id).selected = sel.selected )
+        //     } else {
+        //       listType.value = listOfStyles.type
+        //       list.value = listOfStyles.list              
+        //     }     
+        // })
   })
 
 
@@ -249,7 +263,6 @@ export default {
 
 
   return {
-      SVGFromBuffer,
       selectListOptions,
       listType,
       refreshList,
@@ -311,7 +324,6 @@ export default {
   .row.content{
     flex: 1 1 auto;
     min-height: 200px;
-   
   }
   .row.footer{
     flex: 0 0 40px;
@@ -377,10 +389,10 @@ export default {
       box-sizing: border-box;
     }
 
+
     .content {
       grid-column-end: span 20;
       display: flex;
-      align-items: center;
 
       label {
         flex-grow: 1;

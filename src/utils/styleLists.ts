@@ -84,7 +84,17 @@ export async function getTextStylesList(): Promise<any> {
 		textKeys.forEach(key => {
 		  s[key] = style[key]
 		})
-		s['buffer'] = await frame.exportAsync({format: "SVG"}).then((buffer) => {frame.remove(); return buffer})
+
+
+
+
+		s['img'] = await frame.exportAsync({format: "PNG"}).then((buffer) => {
+			frame.remove();			
+			return "data:image/png;base64," + Buffer.from(buffer).toString('base64');
+			
+		  
+		
+		})
   
 		return s
 	  })

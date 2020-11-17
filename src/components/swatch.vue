@@ -36,8 +36,6 @@ export default {
 
 <style scoped>
 
-
-
 .swatch{
   display: inline-block;
   width: 18px;
