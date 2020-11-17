@@ -58,7 +58,7 @@ import { ref, reactive, computed, watchEffect, onMounted } from 'vue'
 
 import { dispatch, handleEvent } from "./uiMessageHandler";
 
-import { mapOrder } from './util.ts'
+import { mapOrder } from './utils/util'
 
 
 import Disclosure from './components/Disclosure.vue'

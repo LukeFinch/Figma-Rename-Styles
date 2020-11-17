@@ -36,10 +36,11 @@
               @click="onRowClick(item, index, $event)"
               v-bind:class="{selected: item.selected}"
             >
-            <Swatch
+            <Swatch v-if="listType == 'paint'"
                :layers="item.style"
                :alpha="item.alpha"
             />
+            <img v-else-if="listType == 'text'" :src="SVGFromBuffer(item.buffer)" class="style_icon" />
               <div class="content">
                 <input
                   type="checkbox"
@@ -59,8 +60,8 @@
 
     <footer class="row footer">
 
-        <SelectMenu :options="selectListOptions" v-model="listType" />
-        <div class="icon-button" @click="refresh">
+        <SelectMenu :options="selectListOptions" v-model="listType" @change="refreshList" />
+        <div class="icon-button" @click="refreshList">
             <div class="icon icon--swap"></div>
         </div>
 
@@ -82,7 +83,9 @@ import Swatch from './swatch.vue'
 import ScrollArea from './ScrollArea.vue'
 import SelectMenu from './select.vue'
 
-import { mapOrder } from '../util'
+import { mapOrder } from '../utils/util'
+
+
 
 function fuzzySearch(needle, haystack) {
   var hlen = haystack.length;
@@ -123,11 +126,11 @@ export default {
     const isSelected = (item) => item.selected;
 
     const selectListOptions = ref([
-  {value:"paint",label:"Paint Styles"},
-  {value:"text", label:"Text Styles"},
-  {value:"grid", label:"Grids Styles"},
-  {value:"effect", label:"Effect Styles"}
-])
+      {value:"paint",label:"Paint Styles"},
+      {value:"text", label:"Text Styles"},
+      {value:"grid", label:"Grids Styles"},
+      {value:"effect", label:"Effect Styles"}
+    ])
 
     const listType = ref(selectListOptions.value[0].value)
 
@@ -191,26 +194,43 @@ export default {
       }
     }
 
+  function SVGFromBuffer(buffer){
+      const imgBase64 =
+          "data:image/svg+xml;base64," +
+          btoa(
+            new Uint8Array(buffer).reduce((data, byte) => {
+              return data + String.fromCharCode(byte);
+            }, "")
+          );
+        return imgBase64
+}
 
 
-   function refresh(){
-    dispatch("requestColors")
+   function refreshList(){
+     console.log('requesting new list of type: ' + listType.value)
+      dispatch("requestStyles", listType.value)
     }  
 
 
 
     onMounted( () => {
    
+        
+         //dispatch("requestStyles", listType.value)
+        refreshList()
 
-        dispatch("requestColors", listType)
-
-        handleEvent("listColors", listOfColors => {
-
+        handleEvent("styleList", listOfStyles => {
+          console.log(listOfStyles)
+            if(listType.value === listOfStyles.type){
             let prevSel = list.value.filter(li => li.selected)
-
-            list.value = listOfColors
-            
+            list.value = listOfStyles.list            
             prevSel.forEach(sel => list.value.find((li) => li.id === sel.id).selected = sel.selected )
+            } else {
+              listType.value = listOfStyles.type
+              list.value = listOfStyles.list              
+            }
+
+           
 
 
         
@@ -231,9 +251,10 @@ export default {
 
 
   return {
+      SVGFromBuffer,
       selectListOptions,
       listType,
-      refresh,
+      refreshList,
       checkAll,
       onRowClick,
       filteredList,

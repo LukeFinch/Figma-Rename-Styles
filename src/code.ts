@@ -4,8 +4,7 @@ import {getColorStylesList, getTextStylesList, getEffectStylesList, getGridStyle
 
 figma.showUI(__html__, {width: 600, height: 400});
 
-handleEvent('requestList', (type) => {
-
+handleEvent('requestStyles', async (type) => {
 	let list
 
 	switch(type){
@@ -13,7 +12,7 @@ handleEvent('requestList', (type) => {
 			list = getColorStylesList()
 			break;
 		case 'text':
-			list = getTextStylesList()
+			list = await getTextStylesList()
 			break;
 		case 'effect':
 			list = getEffectStylesList()
@@ -23,7 +22,6 @@ handleEvent('requestList', (type) => {
 			break;
 		default: list = getColorStylesList()
 	}
-
 	dispatch('styleList', {type:type,list:list})
 })
 
@@ -37,8 +35,9 @@ handleEvent('createNode', () => {
 });
 handleEvent('rename', (data) => {
 	data.forEach(item => {
-		let p = figma.getLocalPaintStyles().find(paint => paint.id == item.id)
-		p != undefined ? p.name = item.name : null
+		let style = figma.getStyleById(item.id)
+		//let p = figma.getLocalPaintStyles().find(paint => paint.id == item.id)
+		style != undefined ? style.name = item.name : null
 	})
 	figma.notify(`Renamed ${data.length} styles`)
 

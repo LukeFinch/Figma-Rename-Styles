@@ -1,16 +1,16 @@
 import {parseGradient} from './util'
 
-const textKeys = ['id', ...Object.keys(Object.getPrototypeOf(figma.getLocalTextStyles()[0]))] || []
-const paintKeys = ['id', ...Object.keys(Object.getPrototypeOf(figma.getLocalPaintStyles()[0]))] || []
-const effectKeys = ['id', ...Object.keys(Object.getPrototypeOf(figma.getLocalEffectStyles()[0]))] || []
-const gridKeys = ['id', ...Object.keys(Object.getPrototypeOf(figma.getLocalGridStyles()[0]))] || []
+const textKeys = 	['id', ...Object.keys(Object.getPrototypeOf(figma.getLocalTextStyles()[0] 	|| {}	))]
+const paintKeys = 	['id', ...Object.keys(Object.getPrototypeOf(figma.getLocalPaintStyles()[0] 	|| {}	))]
+const effectKeys = 	['id', ...Object.keys(Object.getPrototypeOf(figma.getLocalEffectStyles()[0] || {}	))]
+const gridKeys = 	['id', ...Object.keys(Object.getPrototypeOf(figma.getLocalGridStyles()[0]	|| {}	))]
 
 export function getColorStylesList(){
   
 	let paints: Array<PaintStyle> = figma.getLocalPaintStyles()
 	let colors: Array<Object> = []
   
-	paints.forEach(paint => {
+	paints.forEach(paint => {	
 	
     
 	  let style = []
@@ -41,10 +41,10 @@ export function getColorStylesList(){
 	  colors.push(c)
 	})
 	
-	return colors 
+	return colors
   }
   
-export async function getTextStylesList(){
+export async function getTextStylesList(): Promise<any> {
   
 	let textStyles = figma.getLocalTextStyles()
 	let promises = textStyles.map(x => figma.loadFontAsync(x.fontName))
@@ -95,8 +95,20 @@ export async function getTextStylesList(){
 	}
 
 	export function getGridStylesList(){
-
+		return figma.getLocalGridStyles().map(grid => {
+			let g = {}
+			gridKeys.forEach(key =>{
+				g[key] = grid[key] 
+			})
+			return g
+		})
 	}
 	export function getEffectStylesList(){
-		
+		return figma.getLocalEffectStyles().map(grid => {
+			let g = {}
+			effectKeys.forEach(key =>{
+				g[key] = grid[key] 
+			})
+			return g
+		})
 	}
