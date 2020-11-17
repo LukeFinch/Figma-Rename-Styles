@@ -1,115 +1,56 @@
-import { extractLinearGradientParamsFromTransform}  from "@figma-plugin/helpers"
+import { dispatch, handleEvent } from './codeMessageHandler';
+<<<<<<< HEAD
 
-
-function parseGradient(p) {
-
-  let angle = 180 //angleBetween(gradient.from(), gradient.to())
-  let type = ''
-  switch (p.type) {
-    case 'GRADIENT_LINEAR':
-      type = "linear-gradient"
-      let angleData = extractLinearGradientParamsFromTransform(18, 18,p.gradientTransform)
-
-      angle = angleBetween(angleData.start, angleData.end) + 90
-      break;
-    case 'GRADIENT_RADIAL':
-      type = "radial-gradient"
-      break;
-    case 'GRADIENT_ANGULAR':
-      type = "angular-gradient"
-      break;
-  }
-  let stops = p.gradientStops
-  let str = []
-  stops.forEach(stop => {
-    //We wanted to have gradients be made up of two tokens, but alpha values made things awkard.
-    // let colorToken = colorPalette.getKeyByValue(`${MSColorToRGBA(stop.color())}`)
-    // str.push(` ${colorToken} ${(stop.position().toFixed(4)*100)}%`)
-
-    str.push(`${color255(stop.color)} ${(stop.position.toFixed(4)*100)}%`)
-
-
-  })
-
-  let output = `${type}(${angle}deg, ${str.join(',')})`
-
-  return output
-}
-
-
-function color255(color){
-
-  return `rgba(${color.r * 255},${color.g * 255},${color.b * 255},${color.a})`
-  
-}
-
+import {getColorStylesList, getTextStylesList, getEffectStylesList, getGridStylesList} from './utils/styleLists'
 
 figma.showUI(__html__, {width: 600, height: 400});
-updateList()
 
-function updateList(){
-  
-  let paints = figma.getLocalPaintStyles()
-  let myArr = []
+handleEvent('requestStyles', async (type) => {
+	let list
 
-  paints.forEach(paint => {
-  
-
-
-    let style = []
-
-    let c = {'name':'','id':'','style': [],'alpha': 1}
-
-    paint.paints.forEach(p => {
-      switch(p.type) {
-        case 'SOLID':
-        style.push({background: `rgba(${p.color.r * 255},${p.color.g * 255},${p.color.b * 255},${p.opacity})`, opacity: 1, type: 'solid'})
-        break;
-        case 'IMAGE':
-        break;
-          default:
-
-          style.push({background: parseGradient(p), opacity: p.opacity, type: 'gradient'})
-          break;
-  
-      }
-    })
-    if(paint.paints.length == 1){
-      c.alpha = paint.paints[0].opacity
-    }
-    c.style = style
-    c.name = paint.name
-    c.id = paint.id
-    
-    myArr.push(c)
-  })
-  
-  figma.ui.postMessage({type: "update-list", 'dataStr': JSON.stringify(myArr), 'dataArr': myArr})
-
-}
-
-
-//Used for gradients, to know what direction they face.
-function angleBetween(p1, p2) {
-  let angleDeg = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180 / Math.PI;
-  return Math.round(angleDeg)
-}
-
-figma.ui.onmessage = msg => {
-  if(msg.type === 'refresh-list'){
-    updateList()
-  }
-if (msg.type === 'rename-color') {
-  console.log(msg)  
-  msg.newNames.forEach(dat => { 
-  let p = figma.getLocalPaintStyles().find(paint => paint.id == dat.id)
-
-  p != undefined ? p.name = dat.name : null;
+	switch(type){
+		case 'paint':
+			list = getColorStylesList()
+			break;
+		case 'text':
+			list = await getTextStylesList()
+			break;
+		case 'effect':
+			list = getEffectStylesList()
+			break
+		case 'grid':
+			list = getGridStylesList()
+			break;
+		default: list = getColorStylesList()
+	}
+	dispatch('styleList', {type:type,list:list})
 })
-figma.notify(`Renamed ${msg.newNames.length} styles`)
-  updateList()
-}
-  if(msg.type === 'cancel'){
-    figma.closePlugin();
-  }
-}
+=======
+figma.showUI(__html__);
+>>>>>>> ac1ffc3... First Commit
+
+// The following shows how messages from the UI code can be handled in the main code.
+handleEvent('createNode', () => {
+	const node = figma.createRectangle();
+	node.name = node.id;
+
+	// This shows how the main code can send messages to the UI code.
+	dispatch('nodeCreated', node.id);
+});
+<<<<<<< HEAD
+handleEvent('rename', (data) => {
+	data.forEach(item => {
+		let style = figma.getStyleById(item.id)
+		//let p = figma.getLocalPaintStyles().find(paint => paint.id == item.id)
+		style != undefined ? style.name = item.name : null
+	})
+	figma.notify(`Renamed ${data.length} styles`)
+
+	//TODO dispatch new list of type based on previous type (store in figma preferences ?)
+	// let colorNames = getColorList();
+ 	// dispatch('listColors', colorNames)
+})
+
+  
+=======
+>>>>>>> ac1ffc3... First Commit

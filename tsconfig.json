@@ -1,11 +1,9 @@
 {
-    "compilerOptions": {
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-      "target": "es6",
-      "typeRoots": [
-        "./node_modules/@types",
-        "./node_modules/@figma"
-      ]
-    }
-  }
+	"compilerOptions": {
+		// this aligns with Vue's browser support
+		"target": "es5",
+		// if using webpack 2+ or rollup, to leverage tree shaking:
+		"module": "es2015",
+		"moduleResolution": "node"
+	}
+}
