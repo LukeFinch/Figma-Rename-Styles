@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
 	"name": "Rename Vue3",
+=======
+	"name": "Vue3 Plugin Template",
+>>>>>>> ac1ffc3... First Commit
 	"api": "1.0.0",
 	"main": "dist/code.js",
 	"ui": "dist/ui.html",

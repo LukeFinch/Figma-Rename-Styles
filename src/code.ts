@@ -1,4 +1,5 @@
 import { dispatch, handleEvent } from './codeMessageHandler';
+<<<<<<< HEAD
 
 import {getColorStylesList, getTextStylesList, getEffectStylesList, getGridStylesList} from './utils/styleLists'
 
@@ -24,6 +25,9 @@ handleEvent('requestStyles', async (type) => {
 	}
 	dispatch('styleList', {type:type,list:list})
 })
+=======
+figma.showUI(__html__);
+>>>>>>> ac1ffc3... First Commit
 
 // The following shows how messages from the UI code can be handled in the main code.
 handleEvent('createNode', () => {
@@ -33,6 +37,7 @@ handleEvent('createNode', () => {
 	// This shows how the main code can send messages to the UI code.
 	dispatch('nodeCreated', node.id);
 });
+<<<<<<< HEAD
 handleEvent('rename', (data) => {
 	data.forEach(item => {
 		let style = figma.getStyleById(item.id)
@@ -47,3 +52,5 @@ handleEvent('rename', (data) => {
 })
 
   
+=======
+>>>>>>> ac1ffc3... First Commit

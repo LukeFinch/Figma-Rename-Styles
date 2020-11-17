@@ -46,6 +46,14 @@ module.exports = (env, argv) => ({
 			},
 
 			{
+<<<<<<< HEAD
+=======
+				test: /\.pug$/,
+				loader: 'pug-plain-loader'
+			},
+
+			{
+>>>>>>> ac1ffc3... First Commit
 				test: /\.vue$/,
 				loader: 'vue-loader'
 			},
