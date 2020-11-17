@@ -215,8 +215,6 @@ export default {
 
     onMounted( () => {
    
-        
-         //dispatch("requestStyles", listType.value)
         refreshList()
 
         handleEvent("styleList", listOfStyles => {
