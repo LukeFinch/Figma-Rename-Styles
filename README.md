@@ -1,5 +1,5 @@
 
-# Rename Paint Styles
+# Rename Styles
 https://www.figma.com/community/plugin/899682655913987080/Rename-Paint-Styles
 
 
