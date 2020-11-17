@@ -5,19 +5,19 @@
         <div class="input--with-clear">
           <div class="input input--with-icon">
           <div class="icon icon--search"></div>
-          <input type="text" v-model="search" placeholder="Search" class="input__field" @input="updateCheckAll()">
+          <input type="text" v-model="search" placeholder="Search" class="input__field">
 
-          <div  v-if="search !== '' " class="icon icon--close right" @click='search = ""; updateCheckAll()'></div>
+          <div  v-if="search !== '' " class="icon icon--close right" @click='search = ""'></div>
         </div>
 
           </div>
-           <div>
+           <div style="display: flex; width: 30%">
                 <input
                   type="checkbox"
                   class="checkbox__box"
                   id="checkAll"
-                  @click="checkAll()"
-                  v-model="isCheckAll"
+                  @change="checkAll($event)"
+                  :checked="isCheckAll"
                 />
                 <label
                   for="checkAll"
@@ -47,7 +47,6 @@
                   v-model="selection"
                   :id="item.id"
                   :value="item"
-                  @change="updateCheckAll(item, index, $event)"
                 />
                 
                 <label for="item.id" class="type type--pos-small-normal">
@@ -60,13 +59,7 @@
 
     <footer class="row footer">
 
-
-        <select id="styleSelect" class="select-menu">
-          <option value="1" >Paint</option>
-          <option value="2" >Text</option>
-          <option value="3" >Item 3</option>
-        </select>
-
+        <SelectMenu :options="selectListOptions" v-model="listType" />
         <div class="icon-button" @click="refresh">
             <div class="icon icon--swap"></div>
         </div>
@@ -87,10 +80,9 @@ import { dispatch, handleEvent } from "../uiMessageHandler";
 
 import Swatch from './swatch.vue'
 import ScrollArea from './ScrollArea.vue'
+import SelectMenu from './select.vue'
 
 import { mapOrder } from '../util'
-
-import { selectMenu } from 'figma-plugin-ds'
 
 function fuzzySearch(needle, haystack) {
   var hlen = haystack.length;
@@ -118,7 +110,8 @@ export const selection = computed(() =>  {return list.value.filter(li => {return
 export default {
   components: {
     Swatch,
-    ScrollArea
+    ScrollArea,
+    SelectMenu
   },
   setup( props ) {
 
@@ -127,9 +120,16 @@ export default {
     var lastChecked=null
     var lastCheckedEl=null
 
-    const isCheckAll = computed(() => {
-     return filteredList.value.some((el) => el.selected === false)
-    })
+    const isSelected = (item) => item.selected;
+
+    const selectListOptions = ref([
+  {value:"paint",label:"Paint Styles"},
+  {value:"text", label:"Text Styles"},
+  {value:"grid", label:"Grids Styles"},
+  {value:"effect", label:"Effect Styles"}
+])
+
+    const listType = ref(selectListOptions.value[0].value)
 
     const checkAllLabel = computed(() => isCheckAll.value ? 'None' : 'All')
     const orderedSel    = computed(() => mapOrder(Array.from(selection), list.value))
@@ -137,7 +137,9 @@ export default {
                           return fuzzySearch(search.value.toLowerCase(), item.name.toLowerCase())
                           }))
 
- 
+    const isCheckAll = computed(() => {
+                        return filteredList.value.every(isSelected)
+                        })
 
 
   function onRowClick(item, index, $event) {
@@ -173,15 +175,15 @@ export default {
 
     }
 
-  function checkAll() {
+  function checkAll($event) {
+
       lastChecked = null;
-      isCheckAll.value = !isCheckAll.value;
 
       filteredList.value.forEach((el) => {
         el.selected = false
       });
 
-      if (isCheckAll.value) {
+      if ($event.target.checked) {
         //Check all
         for (var key in filteredList.value) {
           filteredList.value[key].selected = true
@@ -199,9 +201,8 @@ export default {
 
     onMounted( () => {
    
-        selectMenu.init();
 
-        dispatch("requestColors")
+        dispatch("requestColors", listType)
 
         handleEvent("listColors", listOfColors => {
 
@@ -220,6 +221,7 @@ export default {
 
 
 
+
   watchEffect( () => {
     let values = new Set()
     orderedSel.value.forEach(val => values.add(val))
@@ -229,6 +231,8 @@ export default {
 
 
   return {
+      selectListOptions,
+      listType,
       refresh,
       checkAll,
       onRowClick,
@@ -253,7 +257,7 @@ export default {
     
 
 </script>
-<style scoped lang="scss">
+<style lang="scss">
 
 * {
   user-select: none;
@@ -297,8 +301,7 @@ export default {
     justify-content: space-between;
     padding: var(--size-xxxsmall);
 
-    .select-menu {
-      color: red;
+    div.select-menu {
       flex: 1 1 50px;
     }
 
@@ -386,4 +389,8 @@ export default {
   left: auto;
 }
 
+
+#styleSelect{
+  width: 80%;
+}
 </style>

@@ -62,7 +62,7 @@ import { mapOrder } from './util.ts'
 
 
 import Disclosure from './components/Disclosure.vue'
-import ColorList from './components/colorList.vue'
+
 import { default as ShiftList } from './components/ShiftList.vue'
 import ScrollArea from './components/ScrollArea.vue'
 
@@ -70,7 +70,6 @@ import ScrollArea from './components/ScrollArea.vue'
 
 export default {
   components: {
-    ColorList,
     ShiftList,
     Disclosure,
     ScrollArea

@@ -1,6 +1,6 @@
 * Vue 3 Migration
 [ ] * Shift List
-    [ ] Fix 'All' Checkbox
+    [x] Fix 'All' Checkbox
     [ ] Make CSS nicer when we're there
 [ ] * Update watch to composition api
 [ ] * Dynamic swatch display based on type

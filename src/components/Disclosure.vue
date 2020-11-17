@@ -24,7 +24,7 @@ export default {
 
 
   onMounted( () => {
-      disclosure.init()
+      disclosure.init() 
     }   
   )
 }
