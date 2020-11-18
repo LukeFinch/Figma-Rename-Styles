@@ -1,12 +1,12 @@
 import { dispatch, handleEvent } from './codeMessageHandler';
 
-import {getColorStylesList, getTextStylesList, getEffectStylesList, getGridStylesList} from './utils/styleLists'
+import {getColorStylesList, getTextStylesList, getEffectStylesList, getGridStylesList, getTextStylesIcons} from './utils/styleLists'
 
 figma.showUI(__html__, {width: 600, height: 400});
 
 handleEvent('requestStyles', async (type) => {
+	console.log('request from the plugin:',type)
 	let list
-
 	switch(type){
 		case 'paint':
 			list = getColorStylesList()
@@ -25,14 +25,13 @@ handleEvent('requestStyles', async (type) => {
 	dispatch('styleList', {type:type,list:list})
 })
 
-// The following shows how messages from the UI code can be handled in the main code.
-handleEvent('createNode', () => {
-	const node = figma.createRectangle();
-	node.name = node.id;
+handleEvent('requestTextIcons', async() => {
+	const icons = await getTextStylesIcons();
+	dispatch('textIcons', icons)
+})
 
-	// This shows how the main code can send messages to the UI code.
-	dispatch('nodeCreated', node.id);
-});
+// The following shows how messages from the UI code can be handled in the main code.
+
 handleEvent('rename', (data) => {
 	data.forEach(item => {
 		let style = figma.getStyleById(item.id)
@@ -45,5 +44,3 @@ handleEvent('rename', (data) => {
 	// let colorNames = getColorList();
  	// dispatch('listColors', colorNames)
 })
-
-  

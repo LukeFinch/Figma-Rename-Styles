@@ -40,7 +40,7 @@
                :layers="item.style"
                :alpha="item.alpha"
             />
-            <div v-else-if="listType == 'text'" :style="{'background-image': `url(${item.img})`}" class="style_icon style_icon--text" />
+            <div v-else-if="listType == 'text'" :style="{'background-image': `url(${textIcons[item.id]})`}" class="style_icon style_icon--text" />
               <div class="content">
                 <input
                   type="checkbox"
@@ -111,6 +111,7 @@ function fuzzySearch(needle, haystack) {
 }
 const list=ref([])
 export const selection = computed(() =>  {return list.value.filter(li => {return li.selected === true})})
+const textIcons=ref({})
 
 export default {
   components: {
@@ -202,7 +203,6 @@ export default {
    async function refreshList(){
      console.log('requesting new list of type: ' + listType.value)
       dispatch("requestStyles", listType.value)
-
        let prevSel = list.value.slice().filter(li => li.selected)
        list.value = []
       const returnedData = new Promise( function(resolve){
@@ -233,7 +233,18 @@ export default {
 
     onMounted( () => {
    
-        refreshList()
+        //Get The text icons and store them for later
+      
+        dispatch("requestStyles", listType.value)
+        handleEvent("styleList", listOfStyles => {
+          list.value = listOfStyles.list
+        })
+        dispatch("requestTextIcons")
+
+        handleEvent("textIcons", icons => {
+          textIcons.value = icons
+        })
+        // refreshList()
         
         
 
@@ -272,6 +283,7 @@ export default {
       orderedSel,
       checkAllLabel,
       list,
+      textIcons,
       search,
       lastChecked,
       isCheckAll,
