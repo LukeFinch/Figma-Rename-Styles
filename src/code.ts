@@ -1,4 +1,4 @@
-import { dispatch, handleEvent } from './codeMessageHandler';
+import { dispatch, handleEvent } from './utils/codeMessageHandler';
 
 import {getColorStylesList, getTextStylesList, getEffectStylesList, getGridStylesList, getTextStylesIcons} from './utils/styleLists'
 
@@ -12,7 +12,7 @@ handleEvent('requestStyles', async (type) => {
 			list = getColorStylesList()
 			break;
 		case 'text':
-			list = await getTextStylesList()
+			list = getTextStylesList()
 			break;
 		case 'effect':
 			list = getEffectStylesList()
@@ -42,5 +42,6 @@ handleEvent('rename', (data) => {
 
 	//TODO dispatch new list of type based on previous type (store in figma preferences ?)
 	// let colorNames = getColorList();
- 	// dispatch('listColors', colorNames)
+	 // dispatch('listColors', colorNames)
+	 dispatch('renamed')
 })

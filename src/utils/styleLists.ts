@@ -92,25 +92,21 @@ export async function getTextStylesIcons(): Promise<any>{
 			return s
 		  })
 		  const ret = {}
-		  const allStyles = await Promise.all(framePromises).then((result) => {
-			  return Object.assign({}, ...result)
-		  } )
+		  const allStyles = await Promise.all(framePromises)
 		  return allStyles
 		  })	
 	}
 	
 export function getTextStylesList() {
   
-	let textStyles = figma.getLocalTextStyles()
-	return textStyles.forEach(style => {
+	return figma.getLocalTextStyles().map(style => {
 		let s = {}
 		textKeys.forEach(key => {
 			s[key] = style[key]
 		})
+		return s
 	})
-  
-  
-	}
+}
 
 	export function getGridStylesList(){
 		return figma.getLocalGridStyles().map(grid => {

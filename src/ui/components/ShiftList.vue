@@ -40,7 +40,7 @@
                :layers="item.style"
                :alpha="item.alpha"
             />
-            <div v-else-if="listType == 'text'" :style="{'background-image': `url(${textIcons[item.id]})`}" class="style_icon style_icon--text" />
+            <div v-else-if="listType == 'text'" :style="{'background-image': `url(${textIcons.find(icon => icon.id === item.id).img})`}" class="style_icon style_icon--text" />
               <div class="content">
                 <input
                   type="checkbox"
@@ -76,16 +76,15 @@
 <script>
 import { ref, onMounted, computed, watchEffect, inject, reactive, toRefs } from 'vue'
 
-import "../../node_modules/figma-plugin-ds/dist/figma-plugin-ds.css";
-import { dispatch, handleEvent } from "../uiMessageHandler";
-
+// import "../../node_modules/figma-plugin-ds/dist/figma-plugin-ds.css";
+import { dispatch, handleEvent } from "../../utils/uiMessageHandler";
 
 import Swatch from './swatch.vue'
-import ScrollArea from './ScrollArea.vue'
+import ScrollArea from './ScrollArea.vue' 
 import SelectMenu from './select.vue'
 import Spinner from './Spinner.vue'
 
-import { mapOrder } from '../utils/util'
+import { mapOrder } from '../../utils/util'
 
 
 
@@ -243,7 +242,14 @@ export default {
 
         handleEvent("textIcons", icons => {
           textIcons.value = icons
+          console.log(textIcons.value)
         })
+
+        handleEvent('renamed',() => {
+          //This is a cheap workaround for my lazyness. Should send the list type with the rename, then send back the list rather than ping-ponging messages
+          refreshList()
+        })
+
         // refreshList()
         
         
