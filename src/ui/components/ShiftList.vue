@@ -245,7 +245,7 @@ export default {
           console.log(textIcons.value)
         })
 
-        handleEvent('renamed',() => {
+        handleEvent('renamed  ',() => {
           //This is a cheap workaround for my lazyness. Should send the list type with the rename, then send back the list rather than ping-ponging messages
           refreshList()
         })
