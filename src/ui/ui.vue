@@ -52,13 +52,13 @@
 import { selection } from './components/ShiftList.vue'
 
 
-import styles from '../node_modules/figma-plugin-ds/dist/figma-plugin-ds.css'
+import styles from 'figma-plugin-ds/dist/figma-plugin-ds.css'
 
 import { ref, reactive, computed, watchEffect, onMounted } from 'vue'
 
-import { dispatch, handleEvent } from "./uiMessageHandler";
+import { dispatch, handleEvent } from "../utils/uiMessageHandler";
 
-import { mapOrder } from './utils/util'
+import { mapOrder } from '../utils/util'
 
 
 import Disclosure from './components/Disclosure.vue'
@@ -100,6 +100,7 @@ export default {
 
 onMounted( () => {
     watchEffect(() => state.basePreview.value = [...selection.value])
+
 })
 
 
@@ -110,7 +111,6 @@ onMounted( () => {
 
  function rename(){
        let data  = state.replacedPreview.map(x => {return {name: x.name, id: x.id}})
-       console.log(data)
        dispatch('rename',data)
     }
     

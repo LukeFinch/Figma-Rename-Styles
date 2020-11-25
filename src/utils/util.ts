@@ -1,5 +1,29 @@
-import { extractLinearGradientParamsFromTransform}  from "@figma-plugin/helpers"
 
+import matrixInverse from 'matrix-inverse'
+
+export function applyMatrixToPoint(matrix: number[][], point: number[]) {
+	return [
+		point[0] * matrix[0][0] + point[1] * matrix[0][1] + matrix[0][2],
+		point[0] * matrix[1][0] + point[1] * matrix[1][1] + matrix[1][2]
+	]
+}
+
+export function extractLinearGradientParamsFromTransform(
+	shapeWidth: number,
+	shapeHeight: number,
+	t: Transform
+) {
+	const transform = t.length === 2 ? [...t, [0, 0, 1]] : [...t]
+	const mxInv = matrixInverse(transform)
+	const startEnd = [
+		[0, 0.5],
+		[1, 0.5]
+	].map((p) => applyMatrixToPoint(mxInv, p))
+	return {
+		start: [startEnd[0][0] * shapeWidth, startEnd[0][1] * shapeHeight],
+		end: [startEnd[1][0] * shapeWidth, startEnd[1][1] * shapeHeight]
+	}
+}
 
 export function rgbaString(color: RGBA){
  	return `rgba(${color.r * 255},${color.g * 255},${color.b * 255},${color.a})` as string

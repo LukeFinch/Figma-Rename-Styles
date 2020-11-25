@@ -43,67 +43,71 @@ export function getColorStylesList(){
 	
 	return colors
   }
+ 
   
 
-export async function getTextStylesList(): Promise<any> {
+export async function getTextStylesIcons(): Promise<any> {
   
 	let textStyles = figma.getLocalTextStyles()
 	let promises = textStyles.map(x => figma.loadFontAsync(x.fontName))
 	return await Promise.all(promises).then(async() => {
-	 
-	  let mainFrame = figma.currentPage
-  
-	  let framePromises = textStyles.map(async(style,index) => {
-  
-		let frame = figma.createFrame()
-		mainFrame.appendChild(frame)
-		frame.fills = []
-		frame.resize(18,18)
-		frame.x = 0
-		frame.y = index*18
-		let node = figma.createText()
-		frame.appendChild(node)
-		node.x = 0
-		node.y = 0
-		node.textStyleId = style.id
-		node.characters = "Ag"
-		let flat  = figma.flatten([node],frame)
-		flat.constrainProportions = true
+		let mainFrame = figma.currentPage
 		
-		if(flat.width > 18){
-		  let ratio = 18 / flat.width
-		  flat.resize(18, flat.height * ratio)
-		}
-		if(flat.height > 18){
-		  let ratio = 18 / flat.height
-		  flat.resize(flat.width * ratio, 18)
-		}
-		flat.x = frame.width - flat.width
-		flat.y = frame.height - flat.height
+		let framePromises = textStyles.map(async(style,index) => {
+  
+			let frame = figma.createFrame()
+			mainFrame.appendChild(frame)
+			frame.fills = []
+			frame.resize(18,18)
+			frame.x = 0
+			frame.y = index*18
+			let node = figma.createText()
+			frame.appendChild(node)
+			node.x = 0
+			node.y = 0
+			node.textStyleId = style.id
+			node.characters = "Ag"
+			let flat  = figma.flatten([node],frame)
+			flat.constrainProportions = true
+			
+			if(flat.width > 18){
+			  let ratio = 18 / flat.width
+			  flat.resize(18, flat.height * ratio)
+			}
+			if(flat.height > 18){
+			  let ratio = 18 / flat.height
+			  flat.resize(flat.width * ratio, 18)
+			}
+			flat.x = frame.width - flat.width
+			flat.y = frame.height - flat.height
+			
+			let s = {}
 		
+			s['id'] = style.id	
+			s['img'] = await frame.exportAsync({format: "PNG"}).then((buffer) => {
+				frame.remove();			
+				return "data:image/png;base64," + Buffer.from(buffer).toString('base64');
+			  			
+			})
+	  
+			return s
+		  })
+		  const ret = {}
+		  const allStyles = await Promise.all(framePromises)
+		  return allStyles
+		  })	
+	}
+	
+export function getTextStylesList() {
+  
+	return figma.getLocalTextStyles().map(style => {
 		let s = {}
 		textKeys.forEach(key => {
-		  s[key] = style[key]
+			s[key] = style[key]
 		})
-
-
-
-
-		s['img'] = await frame.exportAsync({format: "PNG"}).then((buffer) => {
-			frame.remove();			
-			return "data:image/png;base64," + Buffer.from(buffer).toString('base64');
-			
-		  
-		
-		})
-  
 		return s
-	  })
-	  const allStyles = await Promise.all(framePromises).then((result) => {return result} )
-	  return allStyles
-	  })	  
-  
-	}
+	})
+}
 
 	export function getGridStylesList(){
 		return figma.getLocalGridStyles().map(grid => {

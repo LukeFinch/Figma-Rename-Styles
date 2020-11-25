@@ -8,7 +8,7 @@
 
 
 <script>
-import { useModelWrapper } from "../utils/modelWrapper";
+import { useModelWrapper } from "../../utils/modelWrapper";
 import { selectMenu } from 'figma-plugin-ds'
 import { onMounted } from 'vue'
 

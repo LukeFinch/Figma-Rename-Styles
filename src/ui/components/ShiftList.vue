@@ -75,16 +75,15 @@
 <script>
 import { ref, onMounted, computed, watchEffect, inject, reactive, toRefs } from 'vue'
 
-import "../../node_modules/figma-plugin-ds/dist/figma-plugin-ds.css";
-import { dispatch, handleEvent } from "../uiMessageHandler";
-
+// import "../../node_modules/figma-plugin-ds/dist/figma-plugin-ds.css";
+import { dispatch, handleEvent } from "../../utils/uiMessageHandler";
 
 import Swatch from './swatch.vue'
-import ScrollArea from './ScrollArea.vue'
+import ScrollArea from './ScrollArea.vue' 
 import SelectMenu from './select.vue'
 import Spinner from './Spinner.vue'
 
-import { mapOrder } from '../utils/util'
+import { mapOrder } from '../../utils/util'
 
 
 
@@ -110,6 +109,7 @@ function fuzzySearch(needle, haystack) {
 }
 const list=ref([])
 export const selection = computed(() =>  {return list.value.filter(li => {return li.selected === true})})
+const textIcons=ref({})
 
 export default {
   components: {
@@ -199,9 +199,8 @@ export default {
 
 
    async function refreshList(){
-     console.log('requesting new list of type: ' + listType.value)
+     //console.log('requesting new list of type: ' + listType.value)
       dispatch("requestStyles", listType.value)
-
        let prevSel = list.value.slice().filter(li => li.selected)
        list.value = []
       const returnedData = new Promise( function(resolve){
@@ -210,7 +209,7 @@ export default {
         })
       })
       Promise.resolve(returnedData).then((data) => {
-        console.log(data)
+        //console.log(data)
         listType.value = data.type
         list.value = data.list
         prevSel.forEach(sel => list.value.find((li) => li.id === sel.id).selected = sel.selected)
@@ -232,7 +231,25 @@ export default {
 
     onMounted( () => {
    
-        refreshList()
+        //Get The text icons and store them for later
+      
+        dispatch("requestStyles", listType.value)
+        handleEvent("styleList", listOfStyles => {
+          list.value = listOfStyles.list
+        })
+        dispatch("requestTextIcons")
+
+        handleEvent("textIcons", icons => {
+          textIcons.value = icons
+          //console.log(textIcons.value)
+        })
+
+        handleEvent('renamed  ',() => {
+          //This is a cheap workaround for my lazyness. Should send the list type with the rename, then send back the list rather than ping-ponging messages
+          refreshList()
+        })
+
+        // refreshList()
         
         
 
@@ -271,6 +288,7 @@ export default {
       orderedSel,
       checkAllLabel,
       list,
+      textIcons,
       search,
       lastChecked,
       isCheckAll,

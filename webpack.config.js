@@ -2,6 +2,7 @@ const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin
 const RemovePlugin = require('remove-files-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const path = require('path');
 
 module.exports = (env, argv) => ({
@@ -9,7 +10,7 @@ module.exports = (env, argv) => ({
 	devtool: argv.mode === 'production' ? false : 'inline-source-map',
 
 	entry: {
-		ui: './src/ui.ts', // The entry point for your UI code
+		ui: './src/ui/ui.ts', // The entry point for your UI code
 		code: './src/code.ts' // The entry point for your plugin code
 	},
 
@@ -24,7 +25,6 @@ module.exports = (env, argv) => ({
 					appendTsSuffixTo: [/\.vue$/]
 				}
 			},
-
 			// Enables including CSS by doing "import './file.css'" in your TypeScript code
 			{ test: /\.css$/, loader: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
 			{
@@ -44,12 +44,11 @@ module.exports = (env, argv) => ({
 					}
 				]
 			},
-
-			{
+					{
 				test: /\.vue$/,
 				loader: 'vue-loader'
 			},
-
+			
 			// Allows you to use "<%= require('./file.svg') %>" in your HTML code to get a data URI
 			{ test: /\.(png|jpg|gif|webp|svg)$/, loader: [{ loader: 'url-loader' }] }
 		]
@@ -67,12 +66,13 @@ module.exports = (env, argv) => ({
 	plugins:
 		argv.mode === 'production'
 			? [
+					new BundleAnalyzerPlugin(),
 					new VueLoaderPlugin(),
 					new RemovePlugin({
 						after: { include: ['dist/ui.js'] }
 					}),
 					new HtmlWebpackPlugin({
-						template: './src/ui.html',
+						template: './src/ui/ui.html',
 						filename: 'ui.html',
 						inlineSource: '.(js|css|scss)$',
 						chunks: ['ui']
@@ -80,9 +80,10 @@ module.exports = (env, argv) => ({
 					new HtmlWebpackInlineSourcePlugin()
 			  ]
 			: [
+					new BundleAnalyzerPlugin(),
 					new VueLoaderPlugin(),
 					new HtmlWebpackPlugin({
-						template: './src/ui.html',
+						template: './src/ui/ui.html',
 						filename: 'ui.html',
 						inlineSource: '.(js|css|scss)$',
 						chunks: ['ui']
