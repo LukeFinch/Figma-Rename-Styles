@@ -44,6 +44,7 @@ export function getColorStylesList(){
 	return colors
   }
   
+
 export async function getTextStylesList(): Promise<any> {
   
 	let textStyles = figma.getLocalTextStyles()

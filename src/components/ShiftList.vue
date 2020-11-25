@@ -36,11 +36,10 @@
               @click="onRowClick(item, index, $event)"
               v-bind:class="{selected: item.selected}"
             >
-            <Swatch v-if="listType == 'paint'"
-               :layers="item.style"
-               :alpha="item.alpha"
+            <Swatch :listType="listType" :item="item" 
+
             />
-            <div v-else-if="listType == 'text'" :style="{'background-image': `url(${item.img})`}" class="style_icon style_icon--text" />
+            
               <div class="content">
                 <input
                   type="checkbox"
