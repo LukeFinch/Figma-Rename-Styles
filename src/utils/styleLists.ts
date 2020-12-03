@@ -45,10 +45,11 @@ export function getColorStylesList(){
   }
  
   
-export async function getTextStylesIcons(): Promise<any>{
 
-	  	let textStyles = figma.getLocalTextStyles()
-	  	let promises = textStyles.map(x => figma.loadFontAsync(x.fontName))
+export async function getTextStylesIcons(): Promise<any> {
+  
+	let textStyles = figma.getLocalTextStyles()
+	let promises = textStyles.map(x => figma.loadFontAsync(x.fontName))
 	return await Promise.all(promises).then(async() => {
 		let mainFrame = figma.currentPage
 		

@@ -5,7 +5,7 @@ import {getColorStylesList, getTextStylesList, getEffectStylesList, getGridStyle
 figma.showUI(__html__, {width: 600, height: 400});
 
 handleEvent('requestStyles', async (type) => {
-	console.log('request from the plugin:',type)
+	//console.log('request from the plugin:',type)
 	let list
 	switch(type){
 		case 'paint':

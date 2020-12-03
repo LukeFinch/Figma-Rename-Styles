@@ -36,11 +36,10 @@
               @click="onRowClick(item, index, $event)"
               v-bind:class="{selected: item.selected}"
             >
-            <Swatch v-if="listType == 'paint'"
-               :layers="item.style"
-               :alpha="item.alpha"
+            <Swatch :listType="listType" :item="item" 
+
             />
-            <div v-else-if="listType == 'text'" :style="{'background-image': `url(${textIcons.find(icon => icon.id === item.id).img})`}" class="style_icon style_icon--text" />
+            
               <div class="content">
                 <input
                   type="checkbox"
@@ -200,7 +199,7 @@ export default {
 
 
    async function refreshList(){
-     console.log('requesting new list of type: ' + listType.value)
+     //console.log('requesting new list of type: ' + listType.value)
       dispatch("requestStyles", listType.value)
        let prevSel = list.value.slice().filter(li => li.selected)
        list.value = []
@@ -210,7 +209,7 @@ export default {
         })
       })
       Promise.resolve(returnedData).then((data) => {
-        console.log(data)
+        //console.log(data)
         listType.value = data.type
         list.value = data.list
         prevSel.forEach(sel => list.value.find((li) => li.id === sel.id).selected = sel.selected)
@@ -242,7 +241,7 @@ export default {
 
         handleEvent("textIcons", icons => {
           textIcons.value = icons
-          console.log(textIcons.value)
+          //console.log(textIcons.value)
         })
 
         handleEvent('renamed',() => {

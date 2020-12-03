@@ -1,11 +1,11 @@
 <template>
-<div
+<div v-if="listType == 'paint'"
     class="style_icon swatch" 
-    v-bind:class="{ checkerboard: this.alpha !== 1}"
+    v-bind:class="{ checkerboard: item.alpha !== 1}"
 >   
     
     <div
-        v-for="(layer,index) in layers"
+        v-for="(layer,index) in item.style"
         :key=index
         class="layer"
         v-bind:style="{
@@ -14,22 +14,70 @@
         }"
 
     />
-    <div v-if="this.alpha < 1" 
+    <div v-if="item.alpha < 1" 
     class="layer swatchLayerCheckerboard"
     v-bind:style="{
-        opacity: 1 - this.alpha,
+        opacity: 1 - item.alpha,
     }"
     />
     
 </div>
+
+<div v-if="listType == 'text'" :style="{'background-image': `url(${item.img})`}" class="style_icon style_icon--text" />
+<div v-if="listType == 'grid'" class="style_icon "> 
+<div  class="icon figma_icon" :class='gridType(item)'></div>
+</div>
+<!-- <div v-if="listType == 'grid' && item.layoutGrids.slice(-1)[0].pattern == 'ROWS'" class="icon icon--layout-grid-rows"></div>
+<div v-if="listType == 'grid' && item.layoutGrids.slice(-1)[0].pattern == 'COLUMNS'" class="icon icon--layout-grid-columns"></div> -->
 </template>
 
 <script>
+import {computed, onMounted} from 'vue'
+
+//            :layers="item.style"
+//            :alpha="item.alpha"
 export default {
+
   props: {
-     alpha: Number,
-     layers: Array      
+     listType: String,
+     item: Object,
+  },
+  setup(props) {
+
+  function gridType(item){
+      let gridIcon = ""
+      let grids = new Set()
+      if(item.layoutGrids.length == 1){
+        //Need to do a for loop >_<
+        switch (item.layoutGrids[0].pattern){
+          case "GRID":
+            gridIcon = "uniform"
+            break;
+          case "COLUMNS": 
+            gridIcon = "columns"
+            break;
+          case "ROWS":
+            gridIcon = "rows"
+            break;
+          default: gridIcon = "uniform"
+        }
+        } else {  
+            gridIcon = "uniform" 
+          
+        }
+        return 'icon--layout-grid-'+gridIcon
+      }
+    
+
+
+
+
+    return {
+    props,
+    gridType
+    }
   }
+ 
   
 }
 </script>
@@ -63,5 +111,11 @@ export default {
 .checkerboard-background {
   border-radius: 100%;
   background: url('../assets/checkboard.svg')
+}
+
+.figma_icon{
+  width: var(--size-xsmall);
+  height: var(--size-xsmall);
+  background-position: center center;
 }
 </style>
