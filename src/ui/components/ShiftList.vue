@@ -36,6 +36,7 @@
               @click="onRowClick(item, index, $event)"
               v-bind:class="{selected: item.selected}"
             >
+
             <Swatch :listType="listType" :item="item" 
 
             />
@@ -55,7 +56,8 @@
               </div>
             </div>
         </ScrollArea>
-        <Spinner v-else/>
+        <!-- <div v-else><Spinner /><h6>{{'It looks like you don\'t have any listType styles'}}</h6></div> -->
+        
         </div>
 
     <footer class="row footer">
@@ -143,7 +145,7 @@ export default {
                           }))
 
     const isCheckAll = computed(() => {
-                        return filteredList.value.every(isSelected)
+                       return list.value.length > 0 ? filteredList.value.every(isSelected) : false                        
                         })
 
 
@@ -241,7 +243,6 @@ export default {
 
         handleEvent("textIcons", icons => {
           textIcons.value = icons
-          //console.log(textIcons.value)
         })
 
         handleEvent('renamed',() => {
@@ -276,6 +277,15 @@ export default {
 
   })
 
+  watchEffect(() => {
+    //Logic to render text icons
+    if(textIcons.value.length && list.value.length && listType.value == "text"){
+      textIcons.value.forEach(icon => {
+        let item = list.value.find(i => i.id === icon.id)
+        item.img = icon.img
+      })}
+    })
+  
 
 
   return {
@@ -369,7 +379,6 @@ export default {
 .list-column {
   width: 240px;
 
-
   .list-row {
     display: grid;
     grid-template-columns: repeat(28, var(--size-xxsmall));
@@ -417,7 +426,8 @@ export default {
         text-overflow: ellipsis;
         width: 0;
         white-space: nowrap;
-        color: var(--black-8)
+        color: var(--black-8);
+        padding-left: var(--size-xxsmall);
       }
     }
   }

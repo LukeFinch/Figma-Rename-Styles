@@ -66,7 +66,13 @@ module.exports = (env, argv) => ({
 	plugins:
 		argv.mode === 'production'
 			? [
-					new BundleAnalyzerPlugin(),
+					new BundleAnalyzerPlugin(
+						{
+							'openAnalyzer': false,
+							'generateStatsFile': true,
+							'statsFilename': 'Webpack Bundle Stats - Production'
+						}
+					),
 					new VueLoaderPlugin(),
 					new RemovePlugin({
 						after: { include: ['dist/ui.js'] }
@@ -80,7 +86,14 @@ module.exports = (env, argv) => ({
 					new HtmlWebpackInlineSourcePlugin()
 			  ]
 			: [
-					new BundleAnalyzerPlugin(),
+					new BundleAnalyzerPlugin(
+						{
+							'openAnalyzer': false,
+							'generateStatsFile': true,
+							'statsFilename': 'Webpack Bundle Stats - Dev ',
+							'analyzerPort': 8889
+						}
+					),
 					new VueLoaderPlugin(),
 					new HtmlWebpackPlugin({
 						template: './src/ui/ui.html',

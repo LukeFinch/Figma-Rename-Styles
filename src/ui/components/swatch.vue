@@ -27,6 +27,11 @@
 <div v-if="listType == 'grid'" class="style_icon "> 
 <div  class="icon figma_icon" :class='gridType(item)'></div>
 </div>
+
+<div v-if="listType == 'effect'" class="style_icon "> 
+<div  class="icon figma_icon icon--effects" ></div>
+</div>
+
 <!-- <div v-if="listType == 'grid' && item.layoutGrids.slice(-1)[0].pattern == 'ROWS'" class="icon icon--layout-grid-rows"></div>
 <div v-if="listType == 'grid' && item.layoutGrids.slice(-1)[0].pattern == 'COLUMNS'" class="icon icon--layout-grid-columns"></div> -->
 </template>

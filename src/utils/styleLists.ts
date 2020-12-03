@@ -47,7 +47,6 @@ export function getColorStylesList(){
   
 
 export async function getTextStylesIcons(): Promise<any> {
-  
 	let textStyles = figma.getLocalTextStyles()
 	let promises = textStyles.map(x => figma.loadFontAsync(x.fontName))
 	return await Promise.all(promises).then(async() => {
@@ -78,15 +77,21 @@ export async function getTextStylesIcons(): Promise<any> {
 			  let ratio = 18 / flat.height
 			  flat.resize(flat.width * ratio, 18)
 			}
-			flat.x = frame.width - flat.width
-			flat.y = frame.height - flat.height
+			flat.x = frame.width - flat.width -1
+			flat.y = frame.height - flat.height -1
 			
 			let s = {}
 		
 			s['id'] = style.id	
-			s['img'] = await frame.exportAsync({format: "PNG"}).then((buffer) => {
+			// s['img'] = await frame.exportAsync({format: "PNG"}).then((buffer) => {
+			// 	frame.remove();			
+			// 	return "data:image/png;base64," + Buffer.from(buffer).toString('base64');
+			  			
+			// })
+
+			s['img'] = await frame.exportAsync({format: "SVG"}).then((buffer) => {
 				frame.remove();			
-				return "data:image/png;base64," + Buffer.from(buffer).toString('base64');
+				return "data:image/svg+xml;base64," + Buffer.from(buffer).toString('base64');
 			  			
 			})
 	  
